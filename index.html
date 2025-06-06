@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Controle de Recepção Completo</title>
+    <title>Sistema de Controle de Recepção</title>
     <style>
         * {
             margin: 0;
@@ -112,12 +112,6 @@
             gap: 15px;
         }
         
-        .form-row-triple {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 15px;
-        }
-        
         label {
             display: block;
             margin-bottom: 8px;
@@ -209,13 +203,6 @@
             margin-bottom: 25px;
         }
         
-        .stats-ligacoes {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-        
         .stat-card {
             background: linear-gradient(45deg, #2ecc71, #27ae60);
             color: white;
@@ -248,13 +235,6 @@
         .filters {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-        
-        .filters-ligacoes {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
             gap: 15px;
             margin-bottom: 25px;
         }
@@ -315,49 +295,6 @@
             color: #155724;
         }
         
-        .status-transferida {
-            background: #d1f2eb;
-            color: #0c5460;
-        }
-        
-        .status-naoatendida {
-            background: #f8d7da;
-            color: #721c24;
-        }
-        
-        .status-pendente {
-            background: #fff3cd;
-            color: #856404;
-        }
-        
-        .priority {
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-        
-        .priority-alta {
-            background: #f8d7da;
-            color: #721c24;
-        }
-        
-        .priority-media {
-            background: #fff3cd;
-            color: #856404;
-        }
-        
-        .priority-baixa {
-            background: #d4edda;
-            color: #155724;
-        }
-        
-        .actions {
-            display: flex;
-            gap: 5px;
-            flex-wrap: wrap;
-        }
-        
         .dashboard-cards {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -414,15 +351,15 @@
                 flex-direction: column;
             }
             
-            .form-row, .form-row-triple {
+            .form-row {
                 grid-template-columns: 1fr;
             }
             
-            .stats, .stats-ligacoes {
+            .stats {
                 grid-template-columns: repeat(2, 1fr);
             }
             
-            .filters, .filters-ligacoes {
+            .filters {
                 grid-template-columns: 1fr;
             }
             
@@ -443,13 +380,12 @@
     
     <div class="container">
         <div class="header">
-            <h1>🏢 Sistema de Controle de Recepção Completo</h1>
-            <p>Gerencie visitantes presenciais e ligações telefônicas de forma eficiente</p>
+            <h1>🏢 Sistema de Controle de Recepção</h1>
+            <p>Gerencie visitantes presenciais de forma eficiente</p>
         </div>
         
         <div class="tabs">
             <button class="tab active" onclick="sistema.trocarTab('visitantes')">👥 Visitantes Presenciais</button>
-            <button class="tab" onclick="sistema.trocarTab('ligacoes')">📞 Ligações Telefônicas</button>
             <button class="tab" onclick="sistema.trocarTab('dashboard')">📊 Dashboard Geral</button>
         </div>
         
@@ -611,202 +547,27 @@
             </div>
         </div>
         
-        <!-- TAB LIGAÇÕES -->
-        <div id="tab-ligacoes" class="tab-content">
-            <div class="main-content">
-                <div class="form-section">
-                    <h2>📞 Registrar Nova Ligação</h2>
-                    <form id="ligacaoForm">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="nomeLigante">Nome/Empresa *</label>
-                                <input type="text" id="nomeLigante" required placeholder="Quem está ligando">
-                            </div>
-                            <div class="form-group">
-                                <label for="telefoneLigante">Telefone *</label>
-                                <input type="tel" id="telefoneLigante" required placeholder="(11) 99999-9999">
-                            </div>
-                        </div>
-                        
-                        <div class="form-row-triple">
-                            <div class="form-group">
-                                <label for="areaDestino">Área Destino *</label>
-                                <select id="areaDestino" required>
-                                    <option value="">Selecione...</option>
-                                    <option value="Administração">Administração</option>
-                                    <option value="Vendas/Comercial">Vendas/Comercial</option>
-                                    <option value="Suprimentos">Suprimentos</option>
-                                    <option value="Financeiro">Financeiro</option>
-                                    <option value="Gente e Gestão">Gente e Gestão</option>
-                                    <option value="TI/Tecnologia">TI/Tecnologia</option>
-                                    <option value="Produção">Produção</option>
-                                    <option value="Engenharia">Engenharia</option>
-                                    <option value="Diretoria">Diretoria</option>
-                                    <option value="Marketing">Marketing</option>
-                                    <option value="Jurídico">Jurídico</option>
-                                    <option value="Relacionamento com o Cliente">Relacionamento com o Cliente</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="prioridadeLigacao">Prioridade *</label>
-                                <select id="prioridadeLigacao" required>
-                                    <option value="">Selecione...</option>
-                                    <option value="Alta">🔴 Alta</option>
-                                    <option value="Média">🟡 Média</option>
-                                    <option value="Baixa">🟢 Baixa</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="tipoLigacao">Tipo de Ligação *</label>
-                                <select id="tipoLigacao" required>
-                                    <option value="">Selecione...</option>
-                                    <option value="Cliente">Cliente</option>
-                                    <option value="Fornecedor">Fornecedor</option>
-                                    <option value="Parceiro">Parceiro</option>
-                                    <option value="Candidato">Candidato</option>
-                                    <option value="Cobrança">Cobrança</option>
-                                    <option value="Suporte">Suporte</option>
-                                    <option value="Vendas">Vendas</option>
-                                    <option value="Outros">Outros</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="responsavelLigacao">Responsável/Pessoa Procurada</label>
-                            <input type="text" id="responsavelLigacao" placeholder="Para quem quer falar (opcional)">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="assuntoLigacao">Assunto da Ligação *</label>
-                            <textarea id="assuntoLigacao" rows="3" required placeholder="Resumo do que a pessoa precisa/quer"></textarea>
-                        </div>
-                        
-                        <button type="submit" class="btn">📞 Registrar Ligação</button>
-                    </form>
-                </div>
-                
-                <div class="records-section">
-                    <div class="records-header">
-                        <h2>📊 Controle de Ligações</h2>
-                        <div class="export-buttons">
-                            <button class="btn btn-small" onclick="sistema.exportarExcel('ligacoes')">📊 Excel</button>
-                            <button class="btn btn-small" onclick="sistema.exportarPDF('ligacoes')">📄 PDF</button>
-                            <button class="btn btn-small btn-info" onclick="sistema.exportarBackup()">💾 Exportar Backup</button>
-                            <button class="btn btn-small btn-danger" onclick="sistema.limparDados('ligacoes')">🗑️ Limpar Dados</button>
-                        </div>
-                    </div>
-                    
-                    <div class="stats-ligacoes">
-                        <div class="stat-card">
-                            <h3 id="ligacoesHoje">0</h3>
-                            <p>Hoje</p>
-                        </div>
-                        <div class="stat-card">
-                            <h3 id="ligacoesPendentes">0</h3>
-                            <p>Pendentes</p>
-                        </div>
-                        <div class="stat-card">
-                            <h3 id="ligacoesTransferidas">0</h3>
-                            <p>Transferidas</p>
-                        </div>
-                        <div class="stat-card warning">
-                            <h3 id="ligacoesNaoAtendidas">0</h3>
-                            <p>Não Atendidas</p>
-                        </div>
-                        <div class="stat-card danger">
-                            <h3 id="ligacoesPrioridadeAlta">0</h3>
-                            <p>Prioridade Alta</p>
-                        </div>
-                    </div>
-                    
-                    <div class="filters-ligacoes">
-                        <select id="filtroAreaLigacao" onchange="sistema.atualizarLigacoes()">
-                            <option value="">Todas as áreas</option>
-                            <option value="Administração">Administração</option>
-                            <option value="Vendas/Comercial">Vendas/Comercial</option>
-                            <option value="Suprimentos">Suprimentos</option>
-                            <option value="Financeiro">Financeiro</option>
-                            <option value="Gente e Gestão">Gente e Gestão</option>
-                            <option value="TI/Tecnologia">TI/Tecnologia</option>
-                            <option value="Produção">Produção</option>
-                            <option value="Engenharia">Engenharia</option>
-                            <option value="Diretoria">Diretoria</option>
-                            <option value="Marketing">Marketing</option>
-                            <option value="Jurídico">Jurídico</option>
-                            <option value="Relacionamento com o Cliente">Relacionamento com o Cliente</option>
-                        </select>
-                        <select id="filtroTipoLigacao" onchange="sistema.atualizarLigacoes()">
-                            <option value="">Todos os tipos</option>
-                            <option value="Cliente">Cliente</option>
-                            <option value="Fornecedor">Fornecedor</option>
-                            <option value="Parceiro">Parceiro</option>
-                            <option value="Candidato">Candidato</option>
-                            <option value="Cobrança">Cobrança</option>
-                            <option value="Suporte">Suporte</option>
-                            <option value="Vendas">Vendas</option>
-                            <option value="Outros">Outros</option>
-                        </select>
-                        <select id="filtroStatusLigacao" onchange="sistema.atualizarLigacoes()">
-                            <option value="">Todos os status</option>
-                            <option value="Pendente">Pendente</option>
-                            <option value="Transferida">Transferida</option>
-                            <option value="Não Atendida">Não Atendida</option>
-                            <option value="Concluída">Concluída</option>
-                        </select>
-                        <select id="filtroPrioridadeLigacao" onchange="sistema.atualizarLigacoes()">
-                            <option value="">Todas as prioridades</option>
-                            <option value="Alta">Alta</option>
-                            <option value="Média">Média</option>
-                            <option value="Baixa">Baixa</option>
-                        </select>
-                    </div>
-                    
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Horário</th>
-                                    <th>Contato</th>
-                                    <th>Área</th>
-                                    <th>Tipo</th>
-                                    <th>Prioridade</th>
-                                    <th>Assunto</th>
-                                    <th>Status</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="ligacoesTableBody">
-                                <!-- Dados serão preenchidos via JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
         <!-- TAB DASHBOARD -->
         <div id="tab-dashboard" class="tab-content">
             <div class="dashboard-cards">
                 <div class="dashboard-card">
                     <h3>📊 Resumo do Dia</h3>
                     <p><strong id="dashTotalVisitantes">0</strong> visitantes presenciais</p>
-                    <p><strong id="dashTotalLigacoes">0</strong> ligações telefônicas</p>
-                    <p><strong id="dashTotalContatos">0</strong> contatos totais</p>
+                    <p><strong id="dashVisitantesConcluidos">0</strong> visitas concluídas</p>
+                    <p><strong id="dashVisitantesEmAndamento">0</strong> visitas em andamento</p>
                 </div>
                 
                 <div class="dashboard-card">
                     <h3>⚠️ Pendências</h3>
                     <p><strong id="dashVisitantesPendentes">0</strong> visitantes aguardando</p>
-                    <p><strong id="dashLigacoesPendentes">0</strong> ligações pendentes</p>
-                    <p><strong id="dashPrioridadeAlta">0</strong> ligações prioritárias</p>
+                    <p><strong id="dashVisitantesAtrasados">0</strong> visitantes em espera prolongada</p>
                 </div>
                 
                 <div class="dashboard-card">
-                    <h3>📈 Performance</h3>
-                    <p><strong id="dashTaxaAtendimento">0%</strong> taxa de atendimento</p>
-                    <p><strong id="dashMediaLigacoes">0</strong> ligações/dia (média)</p>
-                    <p><strong id="dashAreaMaisAtiva">-</strong> área mais ativa</p>
+                    <h3>📈 Estatísticas</h3>
+                    <p><strong id="dashAreaMaisVisitada">-</strong> área mais visitada</p>
+                    <p><strong id="dashTipoMaisComum">-</strong> tipo mais comum</p>
+                    <p><strong id="dashTaxaConclusao">0%</strong> taxa de conclusão</p>
                 </div>
             </div>
             
@@ -823,8 +584,7 @@
                     <thead>
                         <tr>
                             <th>Data/Hora</th>
-                            <th>Tipo</th>
-                            <th>Contato</th>
+                            <th>Visitante</th>
                             <th>Área</th>
                             <th>Responsável</th>
                             <th>Status</th>
@@ -842,13 +602,11 @@
         // Objeto principal do sistema
         const sistema = {
             visitas: [],
-            ligacoes: [],
             
             init: function() {
                 this.carregarDados();
                 this.setupEventListeners();
                 this.atualizarVisitas();
-                this.atualizarLigacoes();
                 this.atualizarDashboard();
                 
                 // Configurar input de importação de backup
@@ -859,26 +617,17 @@
             
             carregarDados: function() {
                 const visitasSalvas = localStorage.getItem('visitas');
-                const ligacoesSalvas = localStorage.getItem('ligacoes');
-                
                 this.visitas = visitasSalvas ? JSON.parse(visitasSalvas) : [];
-                this.ligacoes = ligacoesSalvas ? JSON.parse(ligacoesSalvas) : [];
             },
             
             salvarDados: function() {
                 localStorage.setItem('visitas', JSON.stringify(this.visitas));
-                localStorage.setItem('ligacoes', JSON.stringify(this.ligacoes));
             },
             
             setupEventListeners: function() {
                 document.getElementById('visitForm').addEventListener('submit', (e) => {
                     e.preventDefault();
                     this.registrarVisita();
-                });
-                
-                document.getElementById('ligacaoForm').addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    this.registrarLigacao();
                 });
             },
             
@@ -925,29 +674,6 @@
                 
                 document.getElementById('visitForm').reset();
                 this.mostrarNotificacao('Visita registrada com sucesso!');
-            },
-            
-            registrarLigacao: function() {
-                const ligacao = {
-                    id: Date.now(),
-                    nomeLigante: document.getElementById('nomeLigante').value,
-                    telefoneLigante: document.getElementById('telefoneLigante').value,
-                    areaDestino: document.getElementById('areaDestino').value,
-                    prioridade: document.getElementById('prioridadeLigacao').value.replace('🔴 ', '').replace('🟡 ', '').replace('🟢 ', ''),
-                    tipoLigacao: document.getElementById('tipoLigacao').value,
-                    responsavelLigacao: document.getElementById('responsavelLigacao').value,
-                    assuntoLigacao: document.getElementById('assuntoLigacao').value,
-                    dataHora: new Date().toISOString(),
-                    status: 'Pendente'
-                };
-                
-                this.ligacoes.push(ligacao);
-                this.salvarDados();
-                this.atualizarLigacoes();
-                this.atualizarDashboard();
-                
-                document.getElementById('ligacaoForm').reset();
-                this.mostrarNotificacao('Ligação registrada com sucesso!');
             },
             
             atualizarVisitas: function() {
@@ -1002,127 +728,83 @@
                 document.getElementById('concluidos').textContent = concluidos;
             },
             
-            atualizarLigacoes: function() {
-                const area = document.getElementById('filtroAreaLigacao').value;
-                const tipo = document.getElementById('filtroTipoLigacao').value;
-                const status = document.getElementById('filtroStatusLigacao').value;
-                const prioridade = document.getElementById('filtroPrioridadeLigacao').value;
-                
-                let ligacoesFiltradas = this.ligacoes;
-                
-                if(area) ligacoesFiltradas = ligacoesFiltradas.filter(l => l.areaDestino === area);
-                if(tipo) ligacoesFiltradas = ligacoesFiltradas.filter(l => l.tipoLigacao === tipo);
-                if(status) ligacoesFiltradas = ligacoesFiltradas.filter(l => l.status === status);
-                if(prioridade) ligacoesFiltradas = ligacoesFiltradas.filter(l => l.prioridade === prioridade);
-                
-                // Ordenar por data mais recente
-                ligacoesFiltradas.sort((a, b) => new Date(b.dataHora) - new Date(a.dataHora));
-                
-                // Atualizar tabela
-                const tbody = document.getElementById('ligacoesTableBody');
-                tbody.innerHTML = '';
-                
-                ligacoesFiltradas.forEach(ligacao => {
-                    const dataHora = new Date(ligacao.dataHora);
-                    const dataFormatada = dataHora.toLocaleDateString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-                    
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${dataFormatada}</td>
-                        <td>${ligacao.nomeLigante}</td>
-                        <td>${ligacao.areaDestino}</td>
-                        <td>${ligacao.tipoLigacao}</td>
-                        <td><span class="priority priority-${ligacao.prioridade.toLowerCase()}">${ligacao.prioridade}</span></td>
-                        <td>${ligacao.assuntoLigacao.substring(0, 30)}${ligacao.assuntoLigacao.length > 30 ? '...' : ''}</td>
-                        <td><span class="status status-${ligacao.status.toLowerCase().replace(' ', '')}">${ligacao.status}</span></td>
-                        <td class="actions">
-                            ${ligacao.status === 'Pendente' ? `
-                                <button class="btn btn-small btn-success" onclick="sistema.atualizarStatusLigacao(${ligacao.id}, 'Concluída')">Atender</button>
-                                <button class="btn btn-small btn-warning" onclick="sistema.atualizarStatusLigacao(${ligacao.id}, 'Transferida')">Transferir</button>
-                                <button class="btn btn-small btn-danger" onclick="sistema.atualizarStatusLigacao(${ligacao.id}, 'Não Atendida')">Não Atender</button>
-                            ` : ''}
-                            <button class="btn btn-small btn-danger" onclick="sistema.excluirLigacao(${ligacao.id})">Excluir</button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-                
-                // Atualizar estatísticas
-                const hoje = new Date().toLocaleDateString('pt-BR');
-                const ligacoesHoje = this.ligacoes.filter(l => new Date(l.dataHora).toLocaleDateString('pt-BR') === hoje);
-                const pendentes = this.ligacoes.filter(l => l.status === 'Pendente').length;
-                const transferidas = this.ligacoes.filter(l => l.status === 'Transferida').length;
-                const naoAtendidas = this.ligacoes.filter(l => l.status === 'Não Atendida').length;
-                const prioridadeAlta = this.ligacoes.filter(l => l.prioridade === 'Alta' && l.status !== 'Concluída').length;
-                
-                document.getElementById('ligacoesHoje').textContent = ligacoesHoje.length;
-                document.getElementById('ligacoesPendentes').textContent = pendentes;
-                document.getElementById('ligacoesTransferidas').textContent = transferidas;
-                document.getElementById('ligacoesNaoAtendidas').textContent = naoAtendidas;
-                document.getElementById('ligacoesPrioridadeAlta').textContent = prioridadeAlta;
-            },
-            
             atualizarDashboard: function() {
                 const hoje = new Date().toLocaleDateString('pt-BR');
                 const visitasHoje = this.visitas.filter(v => new Date(v.dataEntrada).toLocaleDateString('pt-BR') === hoje);
-                const ligacoesHoje = this.ligacoes.filter(l => new Date(l.dataHora).toLocaleDateString('pt-BR') === hoje);
+                const visitasConcluidasHoje = visitasHoje.filter(v => v.status === 'Concluído').length;
+                const visitasEmAndamentoHoje = visitasHoje.filter(v => v.status === 'Em Atendimento').length;
                 
                 const visitantesPendentes = this.visitas.filter(v => v.status === 'Aguardando').length;
-                const ligacoesPendentes = this.ligacoes.filter(l => l.status === 'Pendente').length;
-                const prioridadeAlta = this.ligacoes.filter(l => l.prioridade === 'Alta' && l.status !== 'Concluída').length;
                 
-                // Taxa de atendimento
-                const ligacoesConcluidas = this.ligacoes.filter(l => l.status === 'Concluída').length;
-                const taxaAtendimento = this.ligacoes.length > 0 ? Math.round((ligacoesConcluidas / this.ligacoes.length) * 100) : 0;
+                // Visitantes em espera prolongada (mais de 30 minutos)
+                const agora = new Date();
+                const visitantesAtrasados = this.visitas.filter(v => {
+                    if(v.status !== 'Aguardando') return false;
+                    
+                    const dataEntrada = new Date(v.dataEntrada);
+                    const diffMin = Math.floor((agora - dataEntrada) / (1000 * 60));
+                    return diffMin > 30;
+                }).length;
                 
-                // Área mais ativa
-                const contatosPorArea = {};
-                [...this.visitas, ...this.ligacoes].forEach(contato => {
-                    const area = contato.areaProcurada || contato.areaDestino;
-                    contatosPorArea[area] = (contatosPorArea[area] || 0) + 1;
+                // Estatísticas por área e tipo
+                const areas = {};
+                const tipos = {};
+                
+                this.visitas.forEach(visita => {
+                    areas[visita.areaProcurada] = (areas[visita.areaProcurada] || 0) + 1;
+                    tipos[visita.tipoVisitante] = (tipos[visita.tipoVisitante] || 0) + 1;
                 });
                 
-                let areaMaisAtiva = '-';
-                let maxContatos = 0;
-                for(const area in contatosPorArea) {
-                    if(contatosPorArea[area] > maxContatos) {
-                        maxContatos = contatosPorArea[area];
-                        areaMaisAtiva = area;
+                let areaMaisVisitada = '-';
+                let maxArea = 0;
+                for(const area in areas) {
+                    if(areas[area] > maxArea) {
+                        maxArea = areas[area];
+                        areaMaisVisitada = area;
                     }
                 }
                 
+                let tipoMaisComum = '-';
+                let maxTipo = 0;
+                for(const tipo in tipos) {
+                    if(tipos[tipo] > maxTipo) {
+                        maxTipo = tipos[tipo];
+                        tipoMaisComum = tipo;
+                    }
+                }
+                
+                // Taxa de conclusão
+                const visitasConcluidasTotal = this.visitas.filter(v => v.status === 'Concluído').length;
+                const taxaConclusao = this.visitas.length > 0 ? 
+                    Math.round((visitasConcluidasTotal / this.visitas.length) * 100) : 0;
+                
                 // Atualizar dados no dashboard
                 document.getElementById('dashTotalVisitantes').textContent = visitasHoje.length;
-                document.getElementById('dashTotalLigacoes').textContent = ligacoesHoje.length;
-                document.getElementById('dashTotalContatos').textContent = visitasHoje.length + ligacoesHoje.length;
+                document.getElementById('dashVisitantesConcluidos').textContent = visitasConcluidasHoje;
+                document.getElementById('dashVisitantesEmAndamento').textContent = visitasEmAndamentoHoje;
                 document.getElementById('dashVisitantesPendentes').textContent = visitantesPendentes;
-                document.getElementById('dashLigacoesPendentes').textContent = ligacoesPendentes;
-                document.getElementById('dashPrioridadeAlta').textContent = prioridadeAlta;
-                document.getElementById('dashTaxaAtendimento').textContent = `${taxaAtendimento}%`;
-                document.getElementById('dashMediaLigacoes').textContent = this.ligacoes.length > 0 ? Math.round(this.ligacoes.length / 7) : 0;
-                document.getElementById('dashAreaMaisAtiva').textContent = areaMaisAtiva;
+                document.getElementById('dashVisitantesAtrasados').textContent = visitantesAtrasados;
+                document.getElementById('dashAreaMaisVisitada').textContent = areaMaisVisitada;
+                document.getElementById('dashTipoMaisComum').textContent = tipoMaisComum;
+                document.getElementById('dashTaxaConclusao').textContent = `${taxaConclusao}%`;
                 
                 // Atualizar últimas atividades
-                const ultimasVisitas = [...this.visitas].sort((a, b) => new Date(b.dataEntrada) - new Date(a.dataEntrada)).slice(0, 5);
-                const ultimasLigacoes = [...this.ligacoes].sort((a, b) => new Date(b.dataHora) - new Date(a.dataHora)).slice(0, 5);
-                const todasAtividades = [...ultimasVisitas.map(v => ({ ...v, tipo: 'Visita' })), ...ultimasLigacoes.map(l => ({ ...l, tipo: 'Ligação' }))];
-                todasAtividades.sort((a, b) => new Date(b.dataEntrada || b.dataHora) - new Date(a.dataEntrada || a.dataHora)).slice(0, 10);
+                const ultimasVisitas = [...this.visitas].sort((a, b) => new Date(b.dataEntrada) - new Date(a.dataEntrada)).slice(0, 10);
                 
                 const tbody = document.getElementById('ultimasAtividades');
                 tbody.innerHTML = '';
                 
-                todasAtividades.forEach(atividade => {
-                    const data = new Date(atividade.dataEntrada || atividade.dataHora);
+                ultimasVisitas.forEach(visita => {
+                    const data = new Date(visita.dataEntrada);
                     const dataFormatada = data.toLocaleDateString('pt-BR', { hour: '2-digit', minute: '2-digit' });
                     
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td>${dataFormatada}</td>
-                        <td>${atividade.tipo}</td>
-                        <td>${atividade.nomeVisitante || atividade.nomeLigante}</td>
-                        <td>${atividade.areaProcurada || atividade.areaDestino}</td>
-                        <td>${atividade.responsavel || atividade.responsavelLigacao || '-'}</td>
-                        <td><span class="status status-${atividade.status.toLowerCase().replace(' ', '')}">${atividade.status}</span></td>
+                        <td>${visita.nomeVisitante}</td>
+                        <td>${visita.areaProcurada}</td>
+                        <td>${visita.responsavel}</td>
+                        <td><span class="status status-${visita.status.toLowerCase().replace(' ', '')}">${visita.status}</span></td>
                     `;
                     tbody.appendChild(tr);
                 });
@@ -1139,17 +821,6 @@
                 }
             },
             
-            atualizarStatusLigacao: function(id, novoStatus) {
-                const ligacao = this.ligacoes.find(l => l.id === id);
-                if(ligacao) {
-                    ligacao.status = novoStatus;
-                    this.salvarDados();
-                    this.atualizarLigacoes();
-                    this.atualizarDashboard();
-                    this.mostrarNotificacao(`Status da ligação atualizado para: ${novoStatus}`);
-                }
-            },
-            
             excluirVisita: function(id) {
                 if(confirm('Tem certeza que deseja excluir esta visita?')) {
                     this.visitas = this.visitas.filter(v => v.id !== id);
@@ -1160,50 +831,23 @@
                 }
             },
             
-            excluirLigacao: function(id) {
-                if(confirm('Tem certeza que deseja excluir esta ligação?')) {
-                    this.ligacoes = this.ligacoes.filter(l => l.id !== id);
-                    this.salvarDados();
-                    this.atualizarLigacoes();
-                    this.atualizarDashboard();
-                    this.mostrarNotificacao('Ligação excluída com sucesso!');
-                }
-            },
-            
             exportarExcel: function(tipo) {
-                let dados, nomeArquivo, cabecalhos;
+                if (tipo !== 'visitantes') return;
                 
-                if (tipo === 'visitantes') {
-                    dados = this.visitas.map(v => ({
-                        'Entrada': new Date(v.dataEntrada).toLocaleString('pt-BR'),
-                        'Visitante': v.nomeVisitante,
-                        'Tipo': v.tipoVisitante,
-                        'Empresa/Origem': v.empresaOrigem,
-                        'Telefone': v.telefone,
-                        'Área': v.areaProcurada,
-                        'Responsável': v.responsavel,
-                        'Motivo': v.motivoVisita,
-                        'Status': v.status
-                    }));
-                    cabecalhos = ['Entrada', 'Visitante', 'Tipo', 'Empresa/Origem', 'Telefone', 'Área', 'Responsável', 'Motivo', 'Status'];
-                    nomeArquivo = `visitantes_${new Date().toISOString().slice(0,10)}.xlsx`;
-                } else if (tipo === 'ligacoes') {
-                    dados = this.ligacoes.map(l => ({
-                        'Horário': new Date(l.dataHora).toLocaleString('pt-BR'),
-                        'Contato': l.nomeLigante,
-                        'Telefone': l.telefoneLigante,
-                        'Área': l.areaDestino,
-                        'Tipo': l.tipoLigacao,
-                        'Prioridade': l.prioridade,
-                        'Assunto': l.assuntoLigacao,
-                        'Status': l.status,
-                        'Responsável': l.responsavelLigacao
-                    }));
-                    cabecalhos = ['Horário', 'Contato', 'Telefone', 'Área', 'Tipo', 'Prioridade', 'Assunto', 'Status', 'Responsável'];
-                    nomeArquivo = `ligacoes_${new Date().toISOString().slice(0,10)}.xlsx`;
-                } else {
-                    return;
-                }
+                const dados = this.visitas.map(v => ({
+                    'Entrada': new Date(v.dataEntrada).toLocaleString('pt-BR'),
+                    'Visitante': v.nomeVisitante,
+                    'Tipo': v.tipoVisitante,
+                    'Empresa/Origem': v.empresaOrigem,
+                    'Telefone': v.telefone,
+                    'Área': v.areaProcurada,
+                    'Responsável': v.responsavel,
+                    'Motivo': v.motivoVisita,
+                    'Status': v.status
+                }));
+                
+                const cabecalhos = ['Entrada', 'Visitante', 'Tipo', 'Empresa/Origem', 'Telefone', 'Área', 'Responsável', 'Motivo', 'Status'];
+                const nomeArquivo = `visitantes_${new Date().toISOString().slice(0,10)}.xlsx`;
                 
                 // Criar arquivo Excel
                 let csvContent = "data:text/csv;charset=utf-8,";
@@ -1224,33 +868,18 @@
             },
             
             exportarPDF: function(tipo) {
-                let titulo, dados, cabecalhos;
+                if (tipo !== 'visitantes') return;
                 
-                if (tipo === 'visitantes') {
-                    titulo = 'Relatório de Visitantes';
-                    cabecalhos = ['Entrada', 'Visitante', 'Tipo', 'Área', 'Responsável', 'Status'];
-                    dados = this.visitas.map(v => [
-                        new Date(v.dataEntrada).toLocaleString('pt-BR'),
-                        v.nomeVisitante,
-                        v.tipoVisitante,
-                        v.areaProcurada,
-                        v.responsavel,
-                        v.status
-                    ]);
-                } else if (tipo === 'ligacoes') {
-                    titulo = 'Relatório de Ligações';
-                    cabecalhos = ['Horário', 'Contato', 'Área', 'Tipo', 'Prioridade', 'Status'];
-                    dados = this.ligacoes.map(l => [
-                        new Date(l.dataHora).toLocaleString('pt-BR'),
-                        l.nomeLigante,
-                        l.areaDestino,
-                        l.tipoLigacao,
-                        l.prioridade,
-                        l.status
-                    ]);
-                } else {
-                    return;
-                }
+                let titulo = 'Relatório de Visitantes';
+                let cabecalhos = ['Entrada', 'Visitante', 'Tipo', 'Área', 'Responsável', 'Status'];
+                let dados = this.visitas.map(v => [
+                    new Date(v.dataEntrada).toLocaleString('pt-BR'),
+                    v.nomeVisitante,
+                    v.tipoVisitante,
+                    v.areaProcurada,
+                    v.responsavel,
+                    v.status
+                ]);
                 
                 // Criar conteúdo HTML para o PDF
                 let htmlContent = `
@@ -1300,7 +929,6 @@
             exportarBackup: function() {
                 const data = {
                     visitas: this.visitas,
-                    ligacoes: this.ligacoes,
                     exportadoEm: new Date().toISOString()
                 };
                 
@@ -1319,10 +947,6 @@
                 this.mostrarNotificacao('Backup exportado com sucesso!');
             },
             
-            importarBackup: function() {
-                document.getElementById('backupFile').click();
-            },
-            
             importarBackup: function(event) {
                 const file = event.target.files[0];
                 if (!file) return;
@@ -1331,12 +955,10 @@
                 reader.onload = (e) => {
                     try {
                         const data = JSON.parse(e.target.result);
-                        if (data.visitas && data.ligacoes) {
+                        if (data.visitas) {
                             this.visitas = data.visitas;
-                            this.ligacoes = data.ligacoes;
                             this.salvarDados();
                             this.atualizarVisitas();
-                            this.atualizarLigacoes();
                             this.atualizarDashboard();
                             this.mostrarNotificacao('Backup importado com sucesso!');
                         } else {
@@ -1350,17 +972,14 @@
             },
             
             limparDados: function(tipo) {
-                if(confirm(`Tem certeza que deseja limpar todos os dados de ${tipo}? Esta ação não pode ser desfeita.`)) {
-                    if(tipo === 'visitas') {
-                        this.visitas = [];
-                    } else if(tipo === 'ligacoes') {
-                        this.ligacoes = [];
-                    }
+                if(tipo !== 'visitas') return;
+                
+                if(confirm(`Tem certeza que deseja limpar todos os dados de visitas? Esta ação não pode ser desfeita.`)) {
+                    this.visitas = [];
                     this.salvarDados();
                     this.atualizarVisitas();
-                    this.atualizarLigacoes();
                     this.atualizarDashboard();
-                    this.mostrarNotificacao(`Dados de ${tipo} limpos com sucesso!`);
+                    this.mostrarNotificacao(`Dados de visitas limpos com sucesso!`);
                 }
             }
         };
