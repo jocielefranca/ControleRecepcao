@@ -176,6 +176,10 @@
             background: linear-gradient(45deg, #f39c12, #e67e22);
         }
         
+        .btn-info {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+        }
+        
         .records-section {
             background: white;
         }
@@ -226,6 +230,10 @@
         
         .stat-card.danger {
             background: linear-gradient(45deg, #e74c3c, #c0392b);
+        }
+        
+        .stat-card.info {
+            background: linear-gradient(45deg, #3498db, #2980b9);
         }
         
         .stat-card h3 {
@@ -522,6 +530,7 @@
                         <div class="export-buttons">
                             <button class="btn btn-small" onclick="sistema.exportarExcel('visitantes')">📊 Excel</button>
                             <button class="btn btn-small" onclick="sistema.exportarPDF('visitantes')">📄 PDF</button>
+                            <button class="btn btn-small btn-info" onclick="sistema.exportarBackup()">💾 Exportar Backup</button>
                             <button class="btn btn-small btn-danger" onclick="sistema.limparDados('visitas')">🗑️ Limpar Dados</button>
                         </div>
                     </div>
@@ -683,6 +692,7 @@
                         <div class="export-buttons">
                             <button class="btn btn-small" onclick="sistema.exportarExcel('ligacoes')">📊 Excel</button>
                             <button class="btn btn-small" onclick="sistema.exportarPDF('ligacoes')">📄 PDF</button>
+                            <button class="btn btn-small btn-info" onclick="sistema.exportarBackup()">💾 Exportar Backup</button>
                             <button class="btn btn-small btn-danger" onclick="sistema.limparDados('ligacoes')">🗑️ Limpar Dados</button>
                         </div>
                     </div>
@@ -802,6 +812,10 @@
             
             <div class="records-header">
                 <h2>📋 Últimas Atividades</h2>
+                <div class="export-buttons">
+                    <button class="btn btn-small" onclick="sistema.importarBackup()">📤 Importar Backup</button>
+                    <input type="file" id="backupFile" style="display: none;" accept=".json">
+                </div>
             </div>
             
             <div class="table-container">
@@ -836,6 +850,11 @@
                 this.atualizarVisitas();
                 this.atualizarLigacoes();
                 this.atualizarDashboard();
+                
+                // Configurar input de importação de backup
+                document.getElementById('backupFile').addEventListener('change', (e) => {
+                    this.importarBackup(e);
+                });
             },
             
             carregarDados: function() {
@@ -1152,11 +1171,182 @@
             },
             
             exportarExcel: function(tipo) {
-                this.mostrarNotificacao(`Exportando dados de ${tipo} para Excel...`);
+                let dados, nomeArquivo, cabecalhos;
+                
+                if (tipo === 'visitantes') {
+                    dados = this.visitas.map(v => ({
+                        'Entrada': new Date(v.dataEntrada).toLocaleString('pt-BR'),
+                        'Visitante': v.nomeVisitante,
+                        'Tipo': v.tipoVisitante,
+                        'Empresa/Origem': v.empresaOrigem,
+                        'Telefone': v.telefone,
+                        'Área': v.areaProcurada,
+                        'Responsável': v.responsavel,
+                        'Motivo': v.motivoVisita,
+                        'Status': v.status
+                    }));
+                    cabecalhos = ['Entrada', 'Visitante', 'Tipo', 'Empresa/Origem', 'Telefone', 'Área', 'Responsável', 'Motivo', 'Status'];
+                    nomeArquivo = `visitantes_${new Date().toISOString().slice(0,10)}.xlsx`;
+                } else if (tipo === 'ligacoes') {
+                    dados = this.ligacoes.map(l => ({
+                        'Horário': new Date(l.dataHora).toLocaleString('pt-BR'),
+                        'Contato': l.nomeLigante,
+                        'Telefone': l.telefoneLigante,
+                        'Área': l.areaDestino,
+                        'Tipo': l.tipoLigacao,
+                        'Prioridade': l.prioridade,
+                        'Assunto': l.assuntoLigacao,
+                        'Status': l.status,
+                        'Responsável': l.responsavelLigacao
+                    }));
+                    cabecalhos = ['Horário', 'Contato', 'Telefone', 'Área', 'Tipo', 'Prioridade', 'Assunto', 'Status', 'Responsável'];
+                    nomeArquivo = `ligacoes_${new Date().toISOString().slice(0,10)}.xlsx`;
+                } else {
+                    return;
+                }
+                
+                // Criar arquivo Excel
+                let csvContent = "data:text/csv;charset=utf-8,";
+                csvContent += cabecalhos.join(',') + '\n';
+                dados.forEach(row => {
+                    csvContent += Object.values(row).map(value => `"${value}"`).join(',') + '\n';
+                });
+                
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", nomeArquivo);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                this.mostrarNotificacao(`Exportação para Excel concluída!`);
             },
             
             exportarPDF: function(tipo) {
-                this.mostrarNotificacao(`Exportando dados de ${tipo} para PDF...`);
+                let titulo, dados, cabecalhos;
+                
+                if (tipo === 'visitantes') {
+                    titulo = 'Relatório de Visitantes';
+                    cabecalhos = ['Entrada', 'Visitante', 'Tipo', 'Área', 'Responsável', 'Status'];
+                    dados = this.visitas.map(v => [
+                        new Date(v.dataEntrada).toLocaleString('pt-BR'),
+                        v.nomeVisitante,
+                        v.tipoVisitante,
+                        v.areaProcurada,
+                        v.responsavel,
+                        v.status
+                    ]);
+                } else if (tipo === 'ligacoes') {
+                    titulo = 'Relatório de Ligações';
+                    cabecalhos = ['Horário', 'Contato', 'Área', 'Tipo', 'Prioridade', 'Status'];
+                    dados = this.ligacoes.map(l => [
+                        new Date(l.dataHora).toLocaleString('pt-BR'),
+                        l.nomeLigante,
+                        l.areaDestino,
+                        l.tipoLigacao,
+                        l.prioridade,
+                        l.status
+                    ]);
+                } else {
+                    return;
+                }
+                
+                // Criar conteúdo HTML para o PDF
+                let htmlContent = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>${titulo}</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; }
+                            h1 { text-align: center; color: #1e8449; }
+                            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                            th { background-color: #1e8449; color: white; padding: 10px; text-align: left; }
+                            td { padding: 8px; border: 1px solid #ddd; }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>${titulo}</h1>
+                        <table>
+                            <thead>
+                                <tr>
+                                    ${cabecalhos.map(cab => `<th>${cab}</th>`).join('')}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${dados.map(row => `
+                                    <tr>
+                                        ${row.map(cell => `<td>${cell}</td>`).join('')}
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </body>
+                    </html>
+                `;
+                
+                // Criar e abrir PDF em nova janela
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(htmlContent);
+                printWindow.document.close();
+                printWindow.focus();
+                printWindow.print();
+                printWindow.close();
+                
+                this.mostrarNotificacao(`Exportação para PDF concluída!`);
+            },
+            
+            exportarBackup: function() {
+                const data = {
+                    visitas: this.visitas,
+                    ligacoes: this.ligacoes,
+                    exportadoEm: new Date().toISOString()
+                };
+                
+                const dataStr = JSON.stringify(data, null, 2);
+                const blob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `backup_recepcao_${new Date().toISOString().slice(0,10)}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                this.mostrarNotificacao('Backup exportado com sucesso!');
+            },
+            
+            importarBackup: function() {
+                document.getElementById('backupFile').click();
+            },
+            
+            importarBackup: function(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        if (data.visitas && data.ligacoes) {
+                            this.visitas = data.visitas;
+                            this.ligacoes = data.ligacoes;
+                            this.salvarDados();
+                            this.atualizarVisitas();
+                            this.atualizarLigacoes();
+                            this.atualizarDashboard();
+                            this.mostrarNotificacao('Backup importado com sucesso!');
+                        } else {
+                            alert('Arquivo de backup inválido!');
+                        }
+                    } catch (error) {
+                        alert('Erro ao importar backup: ' + error.message);
+                    }
+                };
+                reader.readAsText(file);
             },
             
             limparDados: function(tipo) {
