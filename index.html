@@ -4,18 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Controle de Recepção</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #27ae60 0%, #2d8650 100%);
+            background: linear-gradient(135deg, #1a5d38 0%, #2d8650 100%);
             min-height: 100vh;
             padding: 20px;
+            color: #333;
         }
         
         .container {
@@ -23,31 +28,53 @@
             margin: 0 auto;
             background: white;
             border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
             overflow: hidden;
         }
         
         .header {
-            background: linear-gradient(45deg, #1e8449, #27ae60);
+            background: linear-gradient(45deg, #1a5d38, #27ae60);
             color: white;
             padding: 30px;
             text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(30deg);
         }
         
         .header h1 {
             font-size: 2.5rem;
             margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
         
         .header p {
             opacity: 0.9;
             font-size: 1.1rem;
+            position: relative;
+            z-index: 1;
+            max-width: 600px;
+            margin: 0 auto;
         }
         
         .tabs {
             display: flex;
             background: #f8f9fa;
             border-bottom: 2px solid #e1e8ed;
+            position: relative;
+            z-index: 10;
         }
         
         .tab {
@@ -61,22 +88,43 @@
             cursor: pointer;
             transition: all 0.3s ease;
             color: #666;
+            position: relative;
+        }
+        
+        .tab::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 3px;
+            background: #27ae60;
+            transform: translateX(-50%);
+            transition: width 0.3s ease;
         }
         
         .tab.active {
-            background: white;
-            color: #1e8449;
-            border-bottom: 3px solid #27ae60;
+            color: #1a5d38;
+        }
+        
+        .tab.active::after {
+            width: 100%;
         }
         
         .tab:hover {
             background: #e9ecef;
-            color: #1e8449;
+            color: #1a5d38;
         }
         
         .tab-content {
             display: none;
             padding: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         .tab-content.active {
@@ -94,12 +142,16 @@
             padding: 30px;
             border-radius: 15px;
             border-left: 5px solid #27ae60;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
         }
         
         .form-section h2 {
-            color: #1e8449;
+            color: #1a5d38;
             margin-bottom: 25px;
             font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
         .form-group {
@@ -116,7 +168,7 @@
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
-            color: #1e8449;
+            color: #1a5d38;
         }
         
         input, select, textarea {
@@ -126,6 +178,7 @@
             border-radius: 8px;
             font-size: 16px;
             transition: all 0.3s ease;
+            background: white;
         }
         
         input:focus, select:focus, textarea:focus {
@@ -135,7 +188,7 @@
         }
         
         .btn {
-            background: linear-gradient(45deg, #27ae60, #1e8449);
+            background: linear-gradient(45deg, #27ae60, #1a5d38);
             color: white;
             border: none;
             padding: 15px 30px;
@@ -145,6 +198,10 @@
             cursor: pointer;
             transition: all 0.3s ease;
             width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
         
         .btn:hover {
@@ -174,6 +231,10 @@
             background: linear-gradient(45deg, #3498db, #2980b9);
         }
         
+        .btn-purple {
+            background: linear-gradient(45deg, #9b59b6, #8e44ad);
+        }
+        
         .records-section {
             background: white;
         }
@@ -183,6 +244,8 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
         }
         
         .export-buttons {
@@ -192,8 +255,11 @@
         }
         
         .records-header h2 {
-            color: #1e8449;
+            color: #1a5d38;
             font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
         .stats {
@@ -209,6 +275,12 @@
             padding: 20px;
             border-radius: 10px;
             text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
         }
         
         .stat-card.warning {
@@ -254,7 +326,7 @@
         }
         
         th {
-            background: #1e8449;
+            background: #1a5d38;
             color: white;
             padding: 15px 10px;
             text-align: left;
@@ -278,6 +350,7 @@
             font-size: 12px;
             font-weight: 600;
             text-transform: uppercase;
+            display: inline-block;
         }
         
         .status-aguardando {
@@ -308,12 +381,20 @@
             border-radius: 15px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.08);
             border-left: 5px solid #27ae60;
+            transition: transform 0.3s ease;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-5px);
         }
         
         .dashboard-card h3 {
-            color: #1e8449;
+            color: #1a5d38;
             margin-bottom: 15px;
             font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
         .notification {
@@ -329,11 +410,44 @@
             opacity: 0;
             transform: translateY(-20px);
             transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
         .notification.show {
             opacity: 1;
             transform: translateY(0);
+        }
+        
+        .actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .area-highlight {
+            background: rgba(39, 174, 96, 0.1);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: 600;
+        }
+        
+        .area-list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .area-item {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            color: #1a5d38;
+            border-left: 4px solid #27ae60;
         }
         
         @media (max-width: 1200px) {
@@ -342,7 +456,17 @@
             }
             
             .dashboard-cards {
-                grid-template-columns: 1fr;
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .area-list {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
         
@@ -355,10 +479,6 @@
                 grid-template-columns: 1fr;
             }
             
-            .stats {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
             .filters {
                 grid-template-columns: 1fr;
             }
@@ -369,52 +489,87 @@
                 gap: 15px;
             }
             
-            .actions {
-                flex-direction: column;
+            .dashboard-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .area-list {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .tab-content {
+                padding: 20px;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-section, .dashboard-card {
+                padding: 20px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="notification" id="notification">Registro adicionado com sucesso!</div>
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span>Registro adicionado com sucesso!</span>
+    </div>
     
     <div class="container">
         <div class="header">
-            <h1>🏢 Sistema de Controle de Recepção</h1>
-            <p>Gerencie visitantes presenciais de forma eficiente</p>
+            <h1><i class="fas fa-building"></i> Sistema de Controle de Recepção</h1>
+            <p>Gerencie visitantes presenciais de forma eficiente com as novas áreas integradas</p>
         </div>
         
         <div class="tabs">
-            <button class="tab active" onclick="sistema.trocarTab('visitantes')">👥 Visitantes Presenciais</button>
-            <button class="tab" onclick="sistema.trocarTab('dashboard')">📊 Dashboard Geral</button>
+            <button class="tab active" onclick="sistema.trocarTab('visitantes')">
+                <i class="fas fa-users"></i> Visitantes Presenciais
+            </button>
+            <button class="tab" onclick="sistema.trocarTab('dashboard')">
+                <i class="fas fa-chart-line"></i> Dashboard Geral
+            </button>
+            <button class="tab" onclick="sistema.trocarTab('areas')">
+                <i class="fas fa-list"></i> Áreas do Sistema
+            </button>
         </div>
         
         <!-- TAB VISITANTES -->
         <div id="tab-visitantes" class="tab-content active">
             <div class="main-content">
                 <div class="form-section">
-                    <h2>📝 Registrar Nova Visita</h2>
+                    <h2><i class="fas fa-edit"></i> Registrar Nova Visita</h2>
                     <form id="visitForm">
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="nomeVisitante">Nome do Visitante *</label>
-                                <input type="text" id="nomeVisitante" required>
+                                <label for="nomeVisitante"><i class="fas fa-user"></i> Nome do Visitante *</label>
+                                <input type="text" id="nomeVisitante" required placeholder="Nome completo do visitante">
                             </div>
                             <div class="form-group">
-                                <label for="empresaOrigem">Empresa/Origem</label>
-                                <input type="text" id="empresaOrigem">
+                                <label for="empresaOrigem"><i class="fas fa-building"></i> Empresa/Origem</label>
+                                <input type="text" id="empresaOrigem" placeholder="Empresa do visitante">
                             </div>
                         </div>
                         
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="tipoVisitante">Tipo de Visitante *</label>
+                                <label for="tipoVisitante"><i class="fas fa-tag"></i> Tipo de Visitante *</label>
                                 <select id="tipoVisitante" required>
                                     <option value="">Selecione...</option>
                                     <option value="Cliente">Cliente</option>
                                     <option value="Parceiro">Parceiro</option>
                                     <option value="Fornecedor">Fornecedor</option>
-                                    <!-- Alterado de Entregador para Corretor -->
                                     <option value="Corretor">Corretor</option>
                                     <option value="Prestador de Serviço">Prestador de Serviço</option>
                                     <option value="Candidato">Candidato</option>
@@ -423,73 +578,82 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="telefone">Telefone</label>
+                                <label for="telefone"><i class="fas fa-phone"></i> Telefone</label>
                                 <input type="tel" id="telefone" placeholder="(11) 99999-9999">
                             </div>
                         </div>
                         
-                        <div class="form-group">
-                            <label for="areaProcurada">Área Procurada *</label>
-                            <select id="areaProcurada" required>
-                                <option value="">Selecione...</option>
-                                <option value="Administração">Administração</option>
-                                <option value="Vendas/Comercial">Vendas/Comercial</option>
-                                <option value="Suprimentos">Suprimentos</option>
-                                <option value="Financeiro">Financeiro</option>
-                                <option value="Gente e Gestão">Gente e Gestão</option>
-                                <option value="TI/Tecnologia">TI/Tecnologia</option>
-                                <option value="Produção">Produção</option>
-                                <option value="Engenharia">Engenharia</option>
-                                <option value="Diretoria">Diretoria</option>
-                                <!-- Adicionada a área de Incorporação -->
-                                <option value="Incorporação">Incorporação</option>
-                                <option value="Marketing">Marketing</option>
-                                <option value="Jurídico">Jurídico</option>
-                                <option value="Relacionamento com o Cliente">Relacionamento com o Cliente</option>
-                                <!-- Adicionada a opção Outros -->
-                                <option value="Outros">Outros</option>
-                            </select>
-                        </div>
+        <div class="form-group">
+            <label for="areaProcurada"><i class="fas fa-map-marker-alt"></i> Área Procurada *</label>
+            <select id="areaProcurada" required>
+                <option value="">Selecione...</option>
+                <option value="Administração">Administração</option>
+                <option value="Cobrança">Cobrança</option>
+                <option value="Contabilidade/controladoria">Contabilidade/Controladoria</option>
+                <option value="Excelência operacional">Excelência Operacional</option>
+                <option value="Financeiro">Financeiro</option>
+                <option value="Incorporação">Incorporação</option>
+                <option value="Jurídico">Jurídico</option>
+                <option value="Marketing">Marketing</option>
+                <option value="Produtos">Produtos</option>
+                <option value="Repasse">Repasse</option>
+                <option value="Relacionamento com o Cliente">Relacionamento com o Cliente</option>
+                <option value="Suprimentos">Suprimentos</option>
+                <option value="TI/Tecnologia">TI/Tecnologia</option>
+                <option value="Vendas/Comercial">Vendas/Comercial</option>
+                <option value="Outros">Outros</option>
+            </select>
+        </div>
                         
                         <div class="form-group">
-                            <label for="responsavel">Responsável/Contato *</label>
+                            <label for="responsavel"><i class="fas fa-user-tie"></i> Responsável/Contato *</label>
                             <input type="text" id="responsavel" required placeholder="Nome da pessoa que vai receber">
                         </div>
                         
                         <div class="form-group">
-                            <label for="motivoVisita">Motivo da Visita</label>
+                            <label for="motivoVisita"><i class="fas fa-comment"></i> Motivo da Visita</label>
                             <textarea id="motivoVisita" rows="3" placeholder="Breve descrição do objetivo da visita"></textarea>
                         </div>
                         
-                        <button type="submit" class="btn">✅ Registrar Entrada</button>
+                        <button type="submit" class="btn">
+                            <i class="fas fa-check"></i> Registrar Entrada
+                        </button>
                     </form>
                 </div>
                 
                 <div class="records-section">
                     <div class="records-header">
-                        <h2>📊 Controle de Visitantes</h2>
+                        <h2><i class="fas fa-table"></i> Controle de Visitantes</h2>
                         <div class="export-buttons">
-                            <button class="btn btn-small" onclick="sistema.exportarExcel('visitantes')">📊 Excel</button>
-                            <button class="btn btn-small" onclick="sistema.exportarPDF('visitantes')">📄 PDF</button>
-                            <button class="btn btn-small btn-info" onclick="sistema.exportarBackup()">💾 Exportar Backup</button>
-                            <button class="btn btn-small btn-danger" onclick="sistema.limparDados('visitas')">🗑️ Limpar Dados</button>
+                            <button class="btn btn-small" onclick="sistema.exportarExcel()">
+                                <i class="fas fa-file-excel"></i> Excel
+                            </button>
+                            <button class="btn btn-small" onclick="sistema.exportarPDF()">
+                                <i class="fas fa-file-pdf"></i> PDF
+                            </button>
+                            <button class="btn btn-small btn-info" onclick="sistema.exportarBackup()">
+                                <i class="fas fa-download"></i> Exportar Backup
+                            </button>
+                            <button class="btn btn-small btn-danger" onclick="sistema.limparDados('visitas')">
+                                <i class="fas fa-trash"></i> Limpar Dados
+                            </button>
                         </div>
                     </div>
                     
                     <div class="stats">
                         <div class="stat-card">
                             <h3 id="totalHoje">0</h3>
-                            <p>Hoje</p>
+                            <p>Visitantes Hoje</p>
                         </div>
                         <div class="stat-card">
                             <h3 id="aguardando">0</h3>
                             <p>Aguardando</p>
                         </div>
-                        <div class="stat-card">
+                        <div class="stat-card info">
                             <h3 id="emAtendimento">0</h3>
                             <p>Em Atendimento</p>
                         </div>
-                        <div class="stat-card">
+                        <div class="stat-card success">
                             <h3 id="concluidos">0</h3>
                             <p>Concluídos</p>
                         </div>
@@ -501,7 +665,6 @@
                             <option value="Cliente">Cliente</option>
                             <option value="Parceiro">Parceiro</option>
                             <option value="Fornecedor">Fornecedor</option>
-                            <!-- Alterado de Entregador para Corretor -->
                             <option value="Corretor">Corretor</option>
                             <option value="Prestador de Serviço">Prestador de Serviço</option>
                             <option value="Candidato">Candidato</option>
@@ -511,20 +674,19 @@
                         <select id="filtroArea" onchange="sistema.atualizarVisitas()">
                             <option value="">Todas as áreas</option>
                             <option value="Administração">Administração</option>
-                            <option value="Vendas/Comercial">Vendas/Comercial</option>
-                            <option value="Suprimentos">Suprimentos</option>
+                            <option value="Cobrança">Cobrança</option>
+                            <option value="Contabilidade/controladoria">Contabilidade/Controladoria</option>
+                            <option value="Excelência operacional">Excelência Operacional</option>
                             <option value="Financeiro">Financeiro</option>
-                            <option value="Gente e Gestão">Gente e Gestão</option>
-                            <option value="TI/Tecnologia">TI/Tecnologia</option>
-                            <option value="Produção">Produção</option>
-                            <option value="Engenharia">Engenharia</option>
-                            <option value="Diretoria">Diretoria</option>
-                            <!-- Adicionada a área de Incorporação -->
                             <option value="Incorporação">Incorporação</option>
-                            <option value="Marketing">Marketing</option>
                             <option value="Jurídico">Jurídico</option>
+                            <option value="Marketing">Marketing</option>
+                            <option value="Produtos">Produtos</option>
+                            <option value="Repasse">Repasse</option>
                             <option value="Relacionamento com o Cliente">Relacionamento com o Cliente</option>
-                            <!-- Adicionada a opção Outros -->
+                            <option value="Suprimentos">Suprimentos</option>
+                            <option value="TI/Tecnologia">TI/Tecnologia</option>
+                            <option value="Vendas/Comercial">Vendas/Comercial</option>
                             <option value="Outros">Outros</option>
                         </select>
                         <select id="filtroStatus" onchange="sistema.atualizarVisitas()">
@@ -536,7 +698,7 @@
                     </div>
                     
                     <div class="table-container">
-                        <table>
+                        <table id="tabelaVisitas">
                             <thead>
                                 <tr>
                                     <th>Entrada</th>
@@ -561,20 +723,21 @@
         <div id="tab-dashboard" class="tab-content">
             <div class="dashboard-cards">
                 <div class="dashboard-card">
-                    <h3>📊 Resumo do Dia</h3>
+                    <h3><i class="fas fa-calendar-day"></i> Resumo do Dia</h3>
                     <p><strong id="dashTotalVisitantes">0</strong> visitantes presenciais</p>
                     <p><strong id="dashVisitantesConcluidos">0</strong> visitas concluídas</p>
                     <p><strong id="dashVisitantesEmAndamento">0</strong> visitas em andamento</p>
                 </div>
                 
                 <div class="dashboard-card">
-                    <h3>⚠️ Pendências</h3>
+                    <h3><i class="fas fa-exclamation-triangle"></i> Pendências</h3>
                     <p><strong id="dashVisitantesPendentes">0</strong> visitantes aguardando</p>
                     <p><strong id="dashVisitantesAtrasados">0</strong> visitantes em espera prolongada</p>
+                    <p><strong id="dashVisitantesSemRegistro">0</strong> visitantes sem motivo registrado</p>
                 </div>
                 
                 <div class="dashboard-card">
-                    <h3>📈 Estatísticas</h3>
+                    <h3><i class="fas fa-chart-pie"></i> Estatísticas</h3>
                     <p><strong id="dashAreaMaisVisitada">-</strong> área mais visitada</p>
                     <p><strong id="dashTipoMaisComum">-</strong> tipo mais comum</p>
                     <p><strong id="dashTaxaConclusao">0%</strong> taxa de conclusão</p>
@@ -582,9 +745,11 @@
             </div>
             
             <div class="records-header">
-                <h2>📋 Últimas Atividades</h2>
+                <h2><i class="fas fa-history"></i> Últimas Atividades</h2>
                 <div class="export-buttons">
-                    <button class="btn btn-small" onclick="sistema.importarBackup()">📤 Importar Backup</button>
+                    <button class="btn btn-small btn-purple" onclick="document.getElementById('backupFile').click()">
+                        <i class="fas fa-upload"></i> Importar Backup
+                    </button>
                     <input type="file" id="backupFile" style="display: none;" accept=".json">
                 </div>
             </div>
@@ -606,6 +771,44 @@
                 </table>
             </div>
         </div>
+        
+        <!-- TAB ÁREAS -->
+        <div id="tab-areas" class="tab-content">
+            <div class="form-section">
+                <h2><i class="fas fa-map-signs"></i> Áreas do Sistema</h2>
+                <p>O sistema agora inclui as seguintes áreas em ordem alfabética:</p>
+                
+                <div class="area-list">
+                    <div class="area-item">Administração</div>
+                    <div class="area-item">Cobrança</div>
+                    <div class="area-item">Contabilidade/Controladoria</div>
+                    <div class="area-item">Excelência Operacional</div>
+                    <div class="area-item">Financeiro</div>
+                    <div class="area-item">Incorporação</div>
+                    <div class="area-item">Jurídico</div>
+                    <div class="area-item">Marketing</div>
+                    <div class="area-item">Produtos</div>
+                    <div class="area-item">Repasse</div>
+                    <div class="area-item">Relacionamento com o Cliente</div>
+                    <div class="area-item">Suprimentos</div>
+                    <div class="area-item">TI/Tecnologia</div>
+                    <div class="area-item">Vendas/Comercial</div>
+                    <div class="area-item">Outros</div>
+                </div>
+                
+                <div style="margin-top: 30px; background: #e8f5e9; padding: 20px; border-radius: 10px;">
+                    <h3><i class="fas fa-info-circle"></i> Áreas Adicionadas</h3>
+                    <p>Foram adicionadas as seguintes áreas conforme solicitado:</p>
+                    <ul style="margin-top: 10px; margin-left: 20px;">
+                        <li><strong>Cobrança</strong> - Responsável por processos de cobrança</li>
+                        <li><strong>Contabilidade/Controladoria</strong> - Área financeira e contábil</li>
+                        <li><strong>Excelência Operacional</strong> - Melhoria de processos internos</li>
+                        <li><strong>Produtos</strong> - Gestão de produtos e serviços</li>
+                        <li><strong>Repasse</strong> - Processos de repasse financeiro</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -623,6 +826,9 @@
                 document.getElementById('backupFile').addEventListener('change', (e) => {
                     this.importarBackup(e);
                 });
+                
+                // Adicionar dados de exemplo
+                this.adicionarDadosExemplo();
             },
             
             carregarDados: function() {
@@ -655,7 +861,7 @@
             
             mostrarNotificacao: function(mensagem) {
                 const notificacao = document.getElementById('notification');
-                notificacao.textContent = mensagem;
+                notificacao.querySelector('span').textContent = mensagem;
                 notificacao.classList.add('show');
                 
                 setTimeout(() => {
@@ -713,13 +919,13 @@
                         <td>${dataFormatada}</td>
                         <td>${visita.nomeVisitante}</td>
                         <td>${visita.tipoVisitante}</td>
-                        <td>${visita.areaProcurada}</td>
+                        <td><span class="area-highlight">${visita.areaProcurada}</span></td>
                         <td>${visita.responsavel}</td>
                         <td><span class="status status-${visita.status.toLowerCase().replace(' ', '')}">${visita.status}</span></td>
                         <td class="actions">
-                            ${visita.status === 'Aguardando' ? `<button class="btn btn-small btn-success" onclick="sistema.atualizarStatusVisita(${visita.id}, 'Em Atendimento')">Iniciar</button>` : ''}
-                            ${visita.status === 'Em Atendimento' ? `<button class="btn btn-small btn-warning" onclick="sistema.atualizarStatusVisita(${visita.id}, 'Concluído')">Concluir</button>` : ''}
-                            <button class="btn btn-small btn-danger" onclick="sistema.excluirVisita(${visita.id})">Excluir</button>
+                            ${visita.status === 'Aguardando' ? `<button class="btn btn-small btn-success" onclick="sistema.atualizarStatusVisita(${visita.id}, 'Em Atendimento')"><i class="fas fa-play"></i> Iniciar</button>` : ''}
+                            ${visita.status === 'Em Atendimento' ? `<button class="btn btn-small btn-warning" onclick="sistema.atualizarStatusVisita(${visita.id}, 'Concluído')"><i class="fas fa-check"></i> Concluir</button>` : ''}
+                            <button class="btn btn-small btn-danger" onclick="sistema.excluirVisita(${visita.id})"><i class="fas fa-trash"></i> Excluir</button>
                         </td>
                     `;
                     tbody.appendChild(tr);
@@ -755,6 +961,9 @@
                     const diffMin = Math.floor((agora - dataEntrada) / (1000 * 60));
                     return diffMin > 30;
                 }).length;
+                
+                // Visitantes sem motivo registrado
+                const visitantesSemRegistro = this.visitas.filter(v => !v.motivoVisita || v.motivoVisita.trim() === '').length;
                 
                 // Estatísticas por área e tipo
                 const areas = {};
@@ -794,6 +1003,7 @@
                 document.getElementById('dashVisitantesEmAndamento').textContent = visitasEmAndamentoHoje;
                 document.getElementById('dashVisitantesPendentes').textContent = visitantesPendentes;
                 document.getElementById('dashVisitantesAtrasados').textContent = visitantesAtrasados;
+                document.getElementById('dashVisitantesSemRegistro').textContent = visitantesSemRegistro;
                 document.getElementById('dashAreaMaisVisitada').textContent = areaMaisVisitada;
                 document.getElementById('dashTipoMaisComum').textContent = tipoMaisComum;
                 document.getElementById('dashTaxaConclusao').textContent = `${taxaConclusao}%`;
@@ -841,144 +1051,135 @@
                 }
             },
             
-            exportarExcel: function(tipo) {
-                if (tipo !== 'visitantes') return;
-                
-                const dados = this.visitas.map(v => ({
-                    'Entrada': new Date(v.dataEntrada).toLocaleString('pt-BR'),
-                    'Visitante': v.nomeVisitante,
-                    'Tipo': v.tipoVisitante,
-                    'Empresa/Origem': v.empresaOrigem,
-                    'Telefone': v.telefone,
-                    'Área': v.areaProcurada,
-                    'Responsável': v.responsavel,
-                    'Motivo': v.motivoVisita,
-                    'Status': v.status
-                }));
-                
-                const cabecalhos = ['Entrada', 'Visitante', 'Tipo', 'Empresa/Origem', 'Telefone', 'Área', 'Responsável', 'Motivo', 'Status'];
-                const nomeArquivo = `visitantes_${new Date().toISOString().slice(0,10)}.xlsx`;
-                
-                // Criar arquivo Excel
-                let csvContent = "data:text/csv;charset=utf-8,";
-                csvContent += cabecalhos.join(',') + '\n';
-                dados.forEach(row => {
-                    csvContent += Object.values(row).map(value => `"${value}"`).join(',') + '\n';
-                });
-                
-                const encodedUri = encodeURI(csvContent);
-                const link = document.createElement("a");
-                link.setAttribute("href", encodedUri);
-                link.setAttribute("download", nomeArquivo);
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                
-                this.mostrarNotificacao(`Exportação para Excel concluída!`);
+            // FUNÇÕES DE EXPORTAÇÃO CORRIGIDAS
+            exportarExcel: function() {
+                try {
+                    // Preparar dados para exportação
+                    const dados = this.visitas.map(v => ({
+                        'Entrada': new Date(v.dataEntrada).toLocaleString('pt-BR'),
+                        'Visitante': v.nomeVisitante,
+                        'Empresa': v.empresaOrigem || 'N/A',
+                        'Tipo': v.tipoVisitante,
+                        'Telefone': v.telefone || 'N/A',
+                        'Área': v.areaProcurada,
+                        'Responsável': v.responsavel,
+                        'Motivo': v.motivoVisita || 'N/A',
+                        'Status': v.status
+                    }));
+                    
+                    // Criar planilha
+                    const worksheet = XLSX.utils.json_to_sheet(dados);
+                    const workbook = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(workbook, worksheet, 'Visitantes');
+                    
+                    // Gerar arquivo
+                    XLSX.writeFile(workbook, `visitantes_${new Date().toISOString().slice(0,10)}.xlsx`);
+                    
+                    this.mostrarNotificacao('Dados exportados para Excel com sucesso!');
+                } catch (error) {
+                    this.mostrarNotificacao('Erro ao exportar para Excel: ' + error.message);
+                    console.error('Erro exportar Excel:', error);
+                }
             },
             
-            exportarPDF: function(tipo) {
-                if (tipo !== 'visitantes') return;
-                
-                let titulo = 'Relatório de Visitantes';
-                let cabecalhos = ['Entrada', 'Visitante', 'Tipo', 'Área', 'Responsável', 'Status'];
-                let dados = this.visitas.map(v => [
-                    new Date(v.dataEntrada).toLocaleString('pt-BR'),
-                    v.nomeVisitante,
-                    v.tipoVisitante,
-                    v.areaProcurada,
-                    v.responsavel,
-                    v.status
-                ]);
-                
-                // Criar conteúdo HTML para o PDF
-                let htmlContent = `
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <title>${titulo}</title>
-                        <style>
-                            body { font-family: Arial, sans-serif; }
-                            h1 { text-align: center; color: #1e8449; }
-                            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                            th { background-color: #1e8449; color: white; padding: 10px; text-align: left; }
-                            td { padding: 8px; border: 1px solid #ddd; }
-                        </style>
-                    </head>
-                    <body>
-                        <h1>${titulo}</h1>
-                        <table>
-                            <thead>
-                                <tr>
-                                    ${cabecalhos.map(cab => `<th>${cab}</th>`).join('')}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${dados.map(row => `
-                                    <tr>
-                                        ${row.map(cell => `<td>${cell}</td>`).join('')}
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </body>
-                    </html>
-                `;
-                
-                // Criar e abrir PDF em nova janela
-                const printWindow = window.open('', '_blank');
-                printWindow.document.write(htmlContent);
-                printWindow.document.close();
-                printWindow.focus();
-                printWindow.print();
-                printWindow.close();
-                
-                this.mostrarNotificacao(`Exportação para PDF concluída!`);
+            exportarPDF: function() {
+                try {
+                    // Usar jsPDF para gerar PDF
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF();
+                    
+                    // Título
+                    doc.setFontSize(18);
+                    doc.text('Relatório de Visitantes', 105, 15, null, null, 'center');
+                    
+                    // Data
+                    doc.setFontSize(12);
+                    doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, 15, 25);
+                    
+                    // Dados
+                    const headers = [['Entrada', 'Visitante', 'Tipo', 'Área', 'Responsável', 'Status']];
+                    const dados = this.visitas.map(v => [
+                        new Date(v.dataEntrada).toLocaleString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+                        v.nomeVisitante,
+                        v.tipoVisitante,
+                        v.areaProcurada,
+                        v.responsavel,
+                        v.status
+                    ]);
+                    
+                    // Adicionar tabela
+                    doc.autoTable({
+                        head: headers,
+                        body: dados,
+                        startY: 30,
+                        theme: 'grid',
+                        headStyles: { fillColor: [26, 93, 56] }
+                    });
+                    
+                    // Salvar PDF
+                    doc.save(`visitantes_${new Date().toISOString().slice(0,10)}.pdf`);
+                    
+                    this.mostrarNotificacao('Dados exportados para PDF com sucesso!');
+                } catch (error) {
+                    this.mostrarNotificacao('Erro ao exportar para PDF: ' + error.message);
+                    console.error('Erro exportar PDF:', error);
+                }
             },
             
             exportarBackup: function() {
-                const data = {
-                    visitas: this.visitas,
-                    exportadoEm: new Date().toISOString()
-                };
-                
-                const dataStr = JSON.stringify(data, null, 2);
-                const blob = new Blob([dataStr], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `backup_recepcao_${new Date().toISOString().slice(0,10)}.json`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                
-                this.mostrarNotificacao('Backup exportado com sucesso!');
+                try {
+                    const data = {
+                        visitas: this.visitas,
+                        exportadoEm: new Date().toISOString()
+                    };
+                    
+                    const dataStr = JSON.stringify(data, null, 2);
+                    const blob = new Blob([dataStr], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `backup_recepcao_${new Date().toISOString().slice(0,10)}.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    
+                    this.mostrarNotificacao('Backup exportado com sucesso!');
+                } catch (error) {
+                    this.mostrarNotificacao('Erro ao exportar backup: ' + error.message);
+                    console.error('Erro exportar backup:', error);
+                }
             },
             
             importarBackup: function(event) {
-                const file = event.target.files[0];
-                if (!file) return;
-                
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    try {
-                        const data = JSON.parse(e.target.result);
-                        if (data.visitas) {
-                            this.visitas = data.visitas;
-                            this.salvarDados();
-                            this.atualizarVisitas();
-                            this.atualizarDashboard();
-                            this.mostrarNotificacao('Backup importado com sucesso!');
-                        } else {
-                            alert('Arquivo de backup inválido!');
+                try {
+                    const file = event.target.files[0];
+                    if (!file) return;
+                    
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        try {
+                            const data = JSON.parse(e.target.result);
+                            if (data.visitas) {
+                                this.visitas = data.visitas;
+                                this.salvarDados();
+                                this.atualizarVisitas();
+                                this.atualizarDashboard();
+                                this.mostrarNotificacao('Backup importado com sucesso!');
+                            } else {
+                                throw new Error('Arquivo de backup inválido!');
+                            }
+                        } catch (error) {
+                            this.mostrarNotificacao('Erro ao importar backup: ' + error.message);
+                            console.error('Erro importar backup:', error);
                         }
-                    } catch (error) {
-                        alert('Erro ao importar backup: ' + error.message);
-                    }
-                };
-                reader.readAsText(file);
+                    };
+                    reader.readAsText(file);
+                } catch (error) {
+                    this.mostrarNotificacao('Erro ao importar backup: ' + error.message);
+                    console.error('Erro importar backup:', error);
+                }
             },
             
             limparDados: function(tipo) {
@@ -990,6 +1191,35 @@
                     this.atualizarVisitas();
                     this.atualizarDashboard();
                     this.mostrarNotificacao(`Dados de visitas limpos com sucesso!`);
+                }
+            },
+            
+            adicionarDadosExemplo: function() {
+                if (this.visitas.length === 0) {
+                    const exemplos = [
+                        {nomeVisitante: "Carlos Silva", empresaOrigem: "Tech Solutions", tipoVisitante: "Fornecedor", areaProcurada: "Suprimentos", responsavel: "Ana Paula"},
+                        {nomeVisitante: "Mariana Costa", empresaOrigem: "Global Bank", tipoVisitante: "Cliente", areaProcurada: "Financeiro", responsavel: "Roberto Almeida"},
+                        {nomeVisitante: "Fernando Oliveira", empresaOrigem: "Imóveis & Cia", tipoVisitante: "Corretor", areaProcurada: "Incorporação", responsavel: "Patrícia Mendes"},
+                        {nomeVisitante: "Juliana Santos", empresaOrigem: "Consultoria RH", tipoVisitante: "Prestador de Serviço", areaProcurada: "Gente e Gestão", responsavel: "Lucas Ferreira"},
+                        {nomeVisitante: "Ricardo Mendes", empresaOrigem: "Governo Municipal", tipoVisitante: "Visitante Institucional", areaProcurada: "Diretoria", responsavel: "Carolina Dias"}
+                    ];
+                    
+                    exemplos.forEach((ex, i) => {
+                        const visita = {
+                            id: Date.now() + i,
+                            ...ex,
+                            telefone: `(11) 9${Math.floor(1000 + Math.random() * 9000)}-${Math.floor(1000 + Math.random() * 9000)}`,
+                            motivoVisita: i % 2 === 0 ? "Reunião de negócios" : "Apresentação de proposta",
+                            dataEntrada: new Date(Date.now() - (i * 3600000)).toISOString(),
+                            status: i === 0 ? "Aguardando" : (i === 1 ? "Em Atendimento" : "Concluído")
+                        };
+                        
+                        this.visitas.push(visita);
+                    });
+                    
+                    this.salvarDados();
+                    this.atualizarVisitas();
+                    this.atualizarDashboard();
                 }
             }
         };
