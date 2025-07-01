@@ -583,28 +583,28 @@
                             </div>
                         </div>
                         
-        <div class="form-group">
-            <label for="areaProcurada"><i class="fas fa-map-marker-alt"></i> Área Procurada *</label>
-            <select id="areaProcurada" required>
-                <option value="">Selecione...</option>
-                <option value="Administração">Administração</option>
-                <option value="Cobrança">Cobrança</option>
-                <option value="Contabilidade/controladoria">Contabilidade/Controladoria</option>
-                <option value="Excelência operacional">Excelência Operacional</option>
-                <option value="Financeiro">Financeiro</option>
-                <option value="Gente e Gestão">Gente e Gestão</option>
-                <option value="Incorporação">Incorporação</option>
-                <option value="Jurídico">Jurídico</option>
-                <option value="Marketing">Marketing</option>
-                <option value="Produtos">Produtos</option>
-                <option value="Repasse">Repasse</option>
-                <option value="Relacionamento com o Cliente">Relacionamento com o Cliente</option>
-                <option value="Suprimentos">Suprimentos</option>
-                <option value="TI/Tecnologia">TI/Tecnologia</option>
-                <option value="Vendas/Comercial">Vendas/Comercial</option>
-                <option value="Outros">Outros</option>
-            </select>
-        </div>
+                        <div class="form-group">
+                            <label for="areaProcurada"><i class="fas fa-map-marker-alt"></i> Área Procurada *</label>
+                            <select id="areaProcurada" required>
+                                <option value="">Selecione...</option>
+                                <option value="Administração">Administração</option>
+                                <option value="Cobrança">Cobrança</option>
+                                <option value="Contabilidade/controladoria">Contabilidade/Controladoria</option>
+                                <option value="Excelência operacional">Excelência Operacional</option>
+                                <option value="Financeiro">Financeiro</option>
+                                <option value="Gente e Gestão">Gente e Gestão</option>
+                                <option value="Incorporação">Incorporação</option>
+                                <option value="Jurídico">Jurídico</option>
+                                <option value="Marketing">Marketing</option>
+                                <option value="Produtos">Produtos</option>
+                                <option value="Repasse">Repasse</option>
+                                <option value="Relacionamento com o Cliente">Relacionamento com o Cliente</option>
+                                <option value="Suprimentos">Suprimentos</option>
+                                <option value="TI/Tecnologia">TI/Tecnologia</option>
+                                <option value="Vendas/Comercial">Vendas/Comercial</option>
+                                <option value="Outros">Outros</option>
+                            </select>
+                        </div>
                         
                         <div class="form-group">
                             <label for="responsavel"><i class="fas fa-user-tie"></i> Responsável/Contato *</label>
@@ -808,6 +808,7 @@
                         <li><strong>Excelência Operacional</strong> - Melhoria de processos internos</li>
                         <li><strong>Produtos</strong> - Gestão de produtos e serviços</li>
                         <li><strong>Repasse</strong> - Processos de repasse financeiro</li>
+                        <li><strong>Gente e Gestão</strong> - Gestão de pessoas e desenvolvimento organizacional</li>
                     </ul>
                 </div>
             </div>
@@ -815,7 +816,6 @@
     </div>
 
     <script>
-        // Objeto principal do sistema
         const sistema = {
             visitas: [],
             
@@ -825,12 +825,10 @@
                 this.atualizarVisitas();
                 this.atualizarDashboard();
                 
-                // Configurar input de importação de backup
                 document.getElementById('backupFile').addEventListener('change', (e) => {
                     this.importarBackup(e);
                 });
                 
-                // Adicionar dados de exemplo
                 this.adicionarDadosExemplo();
             },
             
@@ -1054,12 +1052,10 @@
                 }
             },
             
-            // FUNÇÕES DE EXPORTAÇÃO CORRIGIDAS
             exportarExcel: function() {
                 try {
-                    // Preparar dados para exportação
                     const dados = this.visitas.map(v => ({
-                        'Entrada': new Date(v.dataEntrada).toLocaleString('pt-BR'),
+                        'Entrada': new Date(v.dataEntrada).toLocaleDateString('pt-BR'),
                         'Visitante': v.nomeVisitante,
                         'Empresa': v.empresaOrigem || 'N/A',
                         'Tipo': v.tipoVisitante,
@@ -1070,14 +1066,11 @@
                         'Status': v.status
                     }));
                     
-                    // Criar planilha
                     const worksheet = XLSX.utils.json_to_sheet(dados);
                     const workbook = XLSX.utils.book_new();
                     XLSX.utils.book_append_sheet(workbook, worksheet, 'Visitantes');
                     
-                    // Gerar arquivo
                     XLSX.writeFile(workbook, `visitantes_${new Date().toISOString().slice(0,10)}.xlsx`);
-                    
                     this.mostrarNotificacao('Dados exportados para Excel com sucesso!');
                 } catch (error) {
                     this.mostrarNotificacao('Erro ao exportar para Excel: ' + error.message);
@@ -1087,22 +1080,18 @@
             
             exportarPDF: function() {
                 try {
-                    // Usar jsPDF para gerar PDF
                     const { jsPDF } = window.jspdf;
                     const doc = new jsPDF();
                     
-                    // Título
                     doc.setFontSize(18);
                     doc.text('Relatório de Visitantes', 105, 15, null, null, 'center');
                     
-                    // Data
                     doc.setFontSize(12);
                     doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, 15, 25);
                     
-                    // Dados
                     const headers = [['Entrada', 'Visitante', 'Tipo', 'Área', 'Responsável', 'Status']];
                     const dados = this.visitas.map(v => [
-                        new Date(v.dataEntrada).toLocaleString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+                        new Date(v.dataEntrada).toLocaleDateString('pt-BR'),
                         v.nomeVisitante,
                         v.tipoVisitante,
                         v.areaProcurada,
@@ -1110,7 +1099,6 @@
                         v.status
                     ]);
                     
-                    // Adicionar tabela
                     doc.autoTable({
                         head: headers,
                         body: dados,
@@ -1119,9 +1107,7 @@
                         headStyles: { fillColor: [26, 93, 56] }
                     });
                     
-                    // Salvar PDF
                     doc.save(`visitantes_${new Date().toISOString().slice(0,10)}.pdf`);
-                    
                     this.mostrarNotificacao('Dados exportados para PDF com sucesso!');
                 } catch (error) {
                     this.mostrarNotificacao('Erro ao exportar para PDF: ' + error.message);
@@ -1227,7 +1213,6 @@
             }
         };
         
-        // Inicializar o sistema quando a página carregar
         window.onload = () => sistema.init();
     </script>
 </body>
