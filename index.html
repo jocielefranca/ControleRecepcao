@@ -574,6 +574,7 @@
                                     <option value="Prestador de Serviço">Prestador de Serviço</option>
                                     <option value="Candidato">Candidato</option>
                                     <option value="Visitante Institucional">Visitante Institucional</option>
+                                    <option value="Diretoria">Diretoria</option>
                                     <option value="Outros">Outros</option>
                                 </select>
                             </div>
@@ -587,18 +588,20 @@
                             <label for="areaProcurada"><i class="fas fa-map-marker-alt"></i> Área Procurada *</label>
                             <select id="areaProcurada" required>
                                 <option value="">Selecione...</option>
+                                <!-- Áreas em ordem alfabética -->
                                 <option value="Administração">Administração</option>
                                 <option value="Cobrança">Cobrança</option>
-                                <option value="Contabilidade/controladoria">Contabilidade/Controladoria</option>
-                                <option value="Excelência operacional">Excelência Operacional</option>
+                                <option value="Contabilidade/Controladoria">Contabilidade/Controladoria</option>
+                                <option value="Diretoria">Diretoria</option>
+                                <option value="Excelência Operacional">Excelência Operacional</option>
                                 <option value="Financeiro">Financeiro</option>
                                 <option value="Gente e Gestão">Gente e Gestão</option>
                                 <option value="Incorporação">Incorporação</option>
                                 <option value="Jurídico">Jurídico</option>
                                 <option value="Marketing">Marketing</option>
                                 <option value="Produtos">Produtos</option>
-                                <option value="Repasse">Repasse</option>
                                 <option value="Relacionamento com o Cliente">Relacionamento com o Cliente</option>
+                                <option value="Repasse">Repasse</option>
                                 <option value="Suprimentos">Suprimentos</option>
                                 <option value="TI/Tecnologia">TI/Tecnologia</option>
                                 <option value="Vendas/Comercial">Vendas/Comercial</option>
@@ -670,22 +673,25 @@
                             <option value="Prestador de Serviço">Prestador de Serviço</option>
                             <option value="Candidato">Candidato</option>
                             <option value="Visitante Institucional">Visitante Institucional</option>
+                            <option value="Diretoria">Diretoria</option>
                             <option value="Outros">Outros</option>
                         </select>
                         <select id="filtroArea" onchange="sistema.atualizarVisitas()">
                             <option value="">Todas as áreas</option>
+                            <!-- Áreas em ordem alfabética -->
                             <option value="Administração">Administração</option>
                             <option value="Cobrança">Cobrança</option>
-                            <option value="Contabilidade/controladoria">Contabilidade/Controladoria</option>
-                            <option value="Excelência operacional">Excelência Operacional</option>
+                            <option value="Contabilidade/Controladoria">Contabilidade/Controladoria</option>
+                            <option value="Diretoria">Diretoria</option>
+                            <option value="Excelência Operacional">Excelência Operacional</option>
                             <option value="Financeiro">Financeiro</option>
                             <option value="Gente e Gestão">Gente e Gestão</option>
                             <option value="Incorporação">Incorporação</option>
                             <option value="Jurídico">Jurídico</option>
                             <option value="Marketing">Marketing</option>
                             <option value="Produtos">Produtos</option>
-                            <option value="Repasse">Repasse</option>
                             <option value="Relacionamento com o Cliente">Relacionamento com o Cliente</option>
+                            <option value="Repasse">Repasse</option>
                             <option value="Suprimentos">Suprimentos</option>
                             <option value="TI/Tecnologia">TI/Tecnologia</option>
                             <option value="Vendas/Comercial">Vendas/Comercial</option>
@@ -784,6 +790,7 @@
                     <div class="area-item">Administração</div>
                     <div class="area-item">Cobrança</div>
                     <div class="area-item">Contabilidade/Controladoria</div>
+                    <div class="area-item">Diretoria</div>
                     <div class="area-item">Excelência Operacional</div>
                     <div class="area-item">Financeiro</div>
                     <div class="area-item">Gente e Gestão</div>
@@ -791,8 +798,8 @@
                     <div class="area-item">Jurídico</div>
                     <div class="area-item">Marketing</div>
                     <div class="area-item">Produtos</div>
-                    <div class="area-item">Repasse</div>
                     <div class="area-item">Relacionamento com o Cliente</div>
+                    <div class="area-item">Repasse</div>
                     <div class="area-item">Suprimentos</div>
                     <div class="area-item">TI/Tecnologia</div>
                     <div class="area-item">Vendas/Comercial</div>
@@ -809,6 +816,7 @@
                         <li><strong>Produtos</strong> - Gestão de produtos e serviços</li>
                         <li><strong>Repasse</strong> - Processos de repasse financeiro</li>
                         <li><strong>Gente e Gestão</strong> - Gestão de pessoas e desenvolvimento organizacional</li>
+                        <li><strong>Diretoria</strong> - Área de gestão executiva e tomada de decisões</li>
                     </ul>
                 </div>
             </div>
@@ -816,6 +824,30 @@
     </div>
 
     <script>
+        // Sistema de Controle de Recepção - Versão 3.1 (áreas em ordem alfabética)
+        // Data da última atualização: 2023-10-15
+        
+        // Lista de áreas em ordem alfabética para uso no sistema
+        const AREAS_EM_ORDEM = [
+            "Administração",
+            "Cobrança",
+            "Contabilidade/Controladoria",
+            "Diretoria",
+            "Excelência Operacional",
+            "Financeiro",
+            "Gente e Gestão",
+            "Incorporação",
+            "Jurídico",
+            "Marketing",
+            "Produtos",
+            "Relacionamento com o Cliente",
+            "Repasse",
+            "Suprimentos",
+            "TI/Tecnologia",
+            "Vendas/Comercial",
+            "Outros"
+        ];
+        
         const sistema = {
             visitas: [],
             
@@ -1052,19 +1084,26 @@
                 }
             },
             
+            // FUNÇÕES DE EXPORTAÇÃO CORRIGIDAS (APENAS DATA)
             exportarExcel: function() {
                 try {
-                    const dados = this.visitas.map(v => ({
-                        'Entrada': new Date(v.dataEntrada).toLocaleDateString('pt-BR'),
-                        'Visitante': v.nomeVisitante,
-                        'Empresa': v.empresaOrigem || 'N/A',
-                        'Tipo': v.tipoVisitante,
-                        'Telefone': v.telefone || 'N/A',
-                        'Área': v.areaProcurada,
-                        'Responsável': v.responsavel,
-                        'Motivo': v.motivoVisita || 'N/A',
-                        'Status': v.status
-                    }));
+                    // Formatar apenas a data (sem hora)
+                    const dados = this.visitas.map(v => {
+                        const data = new Date(v.dataEntrada);
+                        const dataFormatada = `${data.getDate().toString().padStart(2, '0')}/${(data.getMonth() + 1).toString().padStart(2, '0')}/${data.getFullYear()}`;
+                        
+                        return {
+                            'Entrada': dataFormatada,
+                            'Visitante': v.nomeVisitante,
+                            'Empresa': v.empresaOrigem || 'N/A',
+                            'Tipo': v.tipoVisitante,
+                            'Telefone': v.telefone || 'N/A',
+                            'Área': v.areaProcurada,
+                            'Responsável': v.responsavel,
+                            'Motivo': v.motivoVisita || 'N/A',
+                            'Status': v.status
+                        };
+                    });
                     
                     const worksheet = XLSX.utils.json_to_sheet(dados);
                     const workbook = XLSX.utils.book_new();
@@ -1090,14 +1129,21 @@
                     doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, 15, 25);
                     
                     const headers = [['Entrada', 'Visitante', 'Tipo', 'Área', 'Responsável', 'Status']];
-                    const dados = this.visitas.map(v => [
-                        new Date(v.dataEntrada).toLocaleDateString('pt-BR'),
-                        v.nomeVisitante,
-                        v.tipoVisitante,
-                        v.areaProcurada,
-                        v.responsavel,
-                        v.status
-                    ]);
+                    
+                    // Formatar apenas a data (sem hora)
+                    const dados = this.visitas.map(v => {
+                        const data = new Date(v.dataEntrada);
+                        const dataFormatada = `${data.getDate().toString().padStart(2, '0')}/${(data.getMonth() + 1).toString().padStart(2, '0')}/${data.getFullYear()}`;
+                        
+                        return [
+                            dataFormatada,
+                            v.nomeVisitante,
+                            v.tipoVisitante,
+                            v.areaProcurada,
+                            v.responsavel,
+                            v.status
+                        ];
+                    });
                     
                     doc.autoTable({
                         head: headers,
